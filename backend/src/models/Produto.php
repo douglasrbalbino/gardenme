@@ -14,12 +14,14 @@ class Produto extends Entidade
         ?int $idProduto = null,
         ?int $idCategoria = null,
         string $nomeProduto = '',
+        string $descricao = '',
         ?float $preco,
         ?string $criadoEm = null,
         ?string $atualizacaoEm = null
     ) {
         parent::__construct($idProduto, $idCategoria, $criadoEm, $atualizacaoEm);
         $this->nomeProduto = $nomeProduto;
+        $this->descricao = $descricao;
         $this->preco = $preco;
     }
 
@@ -38,16 +40,15 @@ class Produto extends Entidade
         return $this->nomeProduto;
     }
 
+        public function getDescricao(): string
+    {
+        return $this->descricao;
+    }
+
         public function getPreco(): float
     {
         return $this->getPreco;
     }
 }
-
-
-
-
-
-
 
 ?>
