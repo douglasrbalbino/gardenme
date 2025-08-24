@@ -31,6 +31,7 @@ use Garden\Controllers\AuthController;
 use Garden\Controllers\UsuarioController;
 use Garden\Controllers\DicasController;
 use Garden\Controllers\EnderecoController;
+use Garden\Controllers\FotoController; // Novo controller para foto
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
@@ -61,7 +62,8 @@ $requiresAuth = [
     '#^/api/usuarios/(\d+)/enderecos$#' => ['GET', 'POST'],
     '#^/api/enderecos/(\d+)$#' => ['PUT', 'DELETE'],
     '#^/api/usuarios/(\d+)$#' => ['GET', 'PUT', 'DELETE'],
-    '#^/api/categorias/(\d+)$#' => ['DELETE']
+    '#^/api/categorias/(\d+)$#' => ['DELETE'],
+    '#^/api/usuarios/(\d+)/foto$#' => ['POST', 'DELETE'],
 ];
 
 foreach ($requiresAuth as $pattern => $methods) {
@@ -85,7 +87,7 @@ if (preg_match('#^/api/categorias(/(\d+))?$#', $route, $matches)) {
     if ($id) {
         if ($method === 'GET') $controller->detalhar($id);
         if ($method === 'PUT') $controller->atualizar($id);
-        if ($method === 'DELETE' && $dadosToken) $controller->deletar($id, $dadosToken);
+        if ($method === 'DELETE' && $dadosToken) $controller->deletar($id);
     } else {
         if ($method === 'GET') $controller->listar();
         if ($method === 'POST') $controller->criar();
@@ -98,11 +100,11 @@ if (preg_match('#^/api/dicas(/(\d+))?$#', $route, $matches)) {
     $controller = new DicasController();
     if ($id) {
         if ($method === 'GET') $controller->detalhar($id);
-        if ($method === 'PUT' && $dadosToken) $controller->atualizar($id, $dadosToken);
-        if ($method === 'DELETE' && $dadosToken) $controller->deletar($id, $dadosToken);
+        if ($method === 'PUT' && $dadosToken) $controller->atualizar($id);
+        if ($method === 'DELETE' && $dadosToken) $controller->deletar($id);
     } else {
         if ($method === 'GET') $controller->listar();
-        if ($method === 'POST' && $dadosToken) $controller->criar($dadosToken);
+        if ($method === 'POST' && $dadosToken) $controller->criar();
     }
     exit();
 }
@@ -137,6 +139,19 @@ if (preg_match('#^/api/usuarios/(\d+)$#', $route, $matches)) {
     if ($method === 'GET' && $dadosToken) $controller->buscar($id, $dadosToken);
     if ($method === 'PUT' && $dadosToken) $controller->atualizar($id, $dadosToken);
     if ($method === 'DELETE' && $dadosToken) $controller->deletar($id, $dadosToken);
+    exit();
+}
+
+// Novos blocos de roteamento para as fotos
+if (preg_match('#^/api/usuarios/(\d+)/foto$#', $route, $matches)) {
+    $id_usuario = (int)$matches[1];
+    $controller = new FotoController();
+    if ($method === 'POST' && $dadosToken) {
+        $controller->upload($id_usuario, $dadosToken);
+    }
+    if ($method === 'DELETE' && $dadosToken) {
+        $controller->deletar($id_usuario, $dadosToken);
+    }
     exit();
 }
 

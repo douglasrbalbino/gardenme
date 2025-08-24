@@ -1,8 +1,5 @@
 <?php
-
-
 namespace Garden\DAO; 
-
 use PDO;
 use Garden\Core\Database;
 use Garden\Models\Usuario; 
@@ -58,7 +55,7 @@ class UsuarioDAO
     public function buscarPorId(int $id): ?Usuario
     {
         try {
-            $sql = 'SELECT id_usuario, nome, sobrenome, email, celular, criado_em, atualizado_em, is_admin FROM usuario WHERE id_usuario = :id';
+            $sql = 'SELECT id_usuario, nome, sobrenome, email, celular, criado_em, atualizado_em, is_admin, caminho_foto_perfil FROM usuario WHERE id_usuario = :id';
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -71,7 +68,6 @@ class UsuarioDAO
             return null;
         }
     }
-
 
     private function mapUsuario(array $dados): Usuario
     {
@@ -136,6 +132,31 @@ class UsuarioDAO
             if ($e->getCode() === '23000') {
                 return 'conflict';
             }
+            return false;
+        }
+    }
+
+    public function atualizarCaminhoFotoPerfil(int $id, string $caminho): bool
+    {
+        try {
+            $sql = 'UPDATE usuario SET caminho_foto_perfil = :caminho WHERE id_usuario = :id';
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(':caminho', $caminho);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return false;
+        }
+    }
+
+    public function removerCaminhoFotoPerfil(int $id): bool
+    {
+        try {
+            $sql = 'UPDATE usuario SET caminho_foto_perfil = NULL WHERE id_usuario = :id';
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (\PDOException $e) {
             return false;
         }
     }
